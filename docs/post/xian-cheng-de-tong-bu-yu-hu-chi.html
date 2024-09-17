@@ -431,177 +431,177 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><div class="highlight highlight-source-c++"><pre class="notranslate">#include&lt;iostream&gt;
-#include&lt;Windows.h&gt;
-#include&lt;vector&gt;
-#include&lt;set&gt;
-<span class="pl-k">using</span> <span class="pl-k">namespace</span> std;
+<div class="markdown-body" id="postBody"><div class="highlight highlight-source-c++"><pre class="notranslate">#<span class="pl-k">include</span><span class="pl-s"><span class="pl-pds">&lt;</span>iostream<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span><span class="pl-s"><span class="pl-pds">&lt;</span>Windows.h<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span><span class="pl-s"><span class="pl-pds">&lt;</span>vector<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span><span class="pl-s"><span class="pl-pds">&lt;</span>set<span class="pl-pds">&gt;</span></span>
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">std</span><span class="pl-k">;</span>
 
-#define MAX_THREAD_NUM 20
-#define MAX_BUFFER_NUM 50
-#define MAX_PRODUCE_NUM 200
+#<span class="pl-k">define</span> <span class="pl-en">MAX_THREAD_NUM</span> <span class="pl-c1">20</span>
+#<span class="pl-k">define</span> <span class="pl-en">MAX_BUFFER_NUM</span> <span class="pl-c1">50</span>
+#<span class="pl-k">define</span> <span class="pl-en">MAX_PRODUCE_NUM</span> <span class="pl-c1">200</span>
 
-int thread_num;//线程数量
-int n_buffer;//缓冲区数量
-int n_produce;//产品数量
-int Buffer[MAX_BUFFER_NUM];//缓冲区
-HANDLE thread_list[MAX_THREAD_NUM];//线程列表
-HANDLE empty_semaphore;//生产者和消费者同步
-HANDLE p_mutex;//生产者互斥
-HANDLE syn_semaphore[MAX_PRODUCE_NUM];//消费者和生产者同步
-CRITICAL_SECTION pc_cirtical[MAX_BUFFER_NUM];//消费者互斥
+<span class="pl-k">int</span> thread_num;<span class="pl-c"><span class="pl-c">//</span>线程数量</span>
+<span class="pl-k">int</span> n_buffer;<span class="pl-c"><span class="pl-c">//</span>缓冲区数量</span>
+<span class="pl-k">int</span> n_produce;<span class="pl-c"><span class="pl-c">//</span>产品数量</span>
+<span class="pl-k">int</span> Buffer[MAX_BUFFER_NUM];<span class="pl-c"><span class="pl-c">//</span>缓冲区</span>
+HANDLE thread_list[MAX_THREAD_NUM];<span class="pl-c"><span class="pl-c">//</span>线程列表</span>
+HANDLE empty_semaphore;<span class="pl-c"><span class="pl-c">//</span>生产者和消费者同步</span>
+HANDLE p_mutex;<span class="pl-c"><span class="pl-c">//</span>生产者互斥</span>
+HANDLE syn_semaphore[MAX_PRODUCE_NUM];<span class="pl-c"><span class="pl-c">//</span>消费者和生产者同步</span>
+CRITICAL_SECTION pc_cirtical[MAX_BUFFER_NUM];<span class="pl-c"><span class="pl-c">//</span>消费者互斥</span>
 
-//线程信息
-<span class="pl-k">class</span> Thread_Info{
-<span class="pl-k">public</span>:
-	int thread_id;//id
-	char kind;//种类
-	double delay;//线程响应延迟
-	vector&lt;int&gt; request;//请求队列
-	int n_request;//请求数量
+<span class="pl-c"><span class="pl-c">//</span>线程信息</span>
+<span class="pl-k">class</span> <span class="pl-en">Thread_Info</span>{
+<span class="pl-k">public:</span>
+	<span class="pl-k">int</span> thread_id;<span class="pl-c"><span class="pl-c">//</span>id</span>
+	<span class="pl-k">char</span> kind;<span class="pl-c"><span class="pl-c">//</span>种类</span>
+	<span class="pl-k">double</span> delay;<span class="pl-c"><span class="pl-c">//</span>线程响应延迟</span>
+	vector&lt;<span class="pl-k">int</span>&gt; request;<span class="pl-c"><span class="pl-c">//</span>请求队列</span>
+	<span class="pl-k">int</span> n_request;<span class="pl-c"><span class="pl-c">//</span>请求数量</span>
 };
 
-vector&lt;Thread_Info&gt; thread_info;//线程信息数组
-set&lt;int&gt; t_set;//统计实际产品数量
+vector&lt;Thread_Info&gt; thread_info;<span class="pl-c"><span class="pl-c">//</span>线程信息数组</span>
+set&lt;<span class="pl-k">int</span>&gt; t_set;<span class="pl-c"><span class="pl-c">//</span>统计实际产品数量</span>
 
-void PriBuffer(){
-	cout &lt;&lt; endl &lt;&lt; "********************Buffer********************" &lt;&lt; endl &lt;&lt; endl;
-	for (int i = 0; i &lt; n_buffer; i++){
-		cout &lt;&lt; "[" &lt;&lt; i &lt;&lt; "]: " &lt;&lt; Buffer[i]&lt;&lt;"      ";
-		if ((i+1) % 5 == 0){
+<span class="pl-k">void</span> <span class="pl-en">PriBuffer</span>(){
+	cout &lt;&lt; endl &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>********************Buffer********************<span class="pl-pds">"</span></span> &lt;&lt; endl &lt;&lt; endl;
+	<span class="pl-k">for</span> (<span class="pl-k">int</span> i = <span class="pl-c1">0</span>; i &lt; n_buffer; i++){
+		cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-pds">"</span></span> &lt;&lt; i &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>]: <span class="pl-pds">"</span></span> &lt;&lt; Buffer[i]&lt;&lt;<span class="pl-s"><span class="pl-pds">"</span>      <span class="pl-pds">"</span></span>;
+		<span class="pl-k">if</span> ((i+<span class="pl-c1">1</span>) % <span class="pl-c1">5</span> == <span class="pl-c1">0</span>){
 			cout &lt;&lt; endl;
 		}
 	}
-	cout &lt;&lt; endl &lt;&lt; "********************Buffer********************" &lt;&lt; endl &lt;&lt; endl;
+	cout &lt;&lt; endl &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>********************Buffer********************<span class="pl-pds">"</span></span> &lt;&lt; endl &lt;&lt; endl;
 }
 
-int FindProducePosition(){
-	for (int i = 0; i &lt; n_buffer; i++){
-		if (Buffer[i] == -1) { 
-			Buffer[i] = -2;//标记有内容		
-			return i;
+<span class="pl-k">int</span> <span class="pl-en">FindProducePosition</span>(){
+	<span class="pl-k">for</span> (<span class="pl-k">int</span> i = <span class="pl-c1">0</span>; i &lt; n_buffer; i++){
+		<span class="pl-k">if</span> (Buffer[i] == -<span class="pl-c1">1</span>) { 
+			Buffer[i] = -<span class="pl-c1">2</span>;<span class="pl-c"><span class="pl-c">//</span>标记有内容		</span>
+			<span class="pl-k">return</span> i;
 		}
 	}
 }
 
-int FindBufferPosition(int product){
-	for (int i = 0; i &lt; n_buffer; i++){
-		if (Buffer[i] == product) return i;
+<span class="pl-k">int</span> <span class="pl-en">FindBufferPosition</span>(<span class="pl-k">int</span> product){
+	<span class="pl-k">for</span> (<span class="pl-k">int</span> i = <span class="pl-c1">0</span>; i &lt; n_buffer; i++){
+		<span class="pl-k">if</span> (Buffer[i] == product) <span class="pl-k">return</span> i;
 	}
 }
 
-//生产者
-void Produce(void *p){
-	int thread_id = ((Thread_Info*)p)-&gt;thread_id;
-	char kind = ((Thread_Info*)p)-&gt;kind;
-	double delay = ((Thread_Info*)p)-&gt;delay;
-	int n_rerquest = ((Thread_Info*)p)-&gt;n_request;
-	vector&lt;int&gt; request = ((Thread_Info*)p)-&gt;request;
-	Sleep(delay);//休眠
-	cout &lt;&lt; "生产者 " &lt;&lt; thread_id &lt;&lt; " 开始生产" &lt;&lt; endl;
+<span class="pl-c"><span class="pl-c">//</span>生产者</span>
+<span class="pl-k">void</span> <span class="pl-en">Produce</span>(<span class="pl-k">void</span> *p){
+	<span class="pl-k">int</span> thread_id = ((Thread_Info*)p)-&gt;<span class="pl-smi">thread_id</span>;
+	<span class="pl-k">char</span> kind = ((Thread_Info*)p)-&gt;<span class="pl-smi">kind</span>;
+	<span class="pl-k">double</span> delay = ((Thread_Info*)p)-&gt;<span class="pl-smi">delay</span>;
+	<span class="pl-k">int</span> n_rerquest = ((Thread_Info*)p)-&gt;<span class="pl-smi">n_request</span>;
+	vector&lt;<span class="pl-k">int</span>&gt; request = ((Thread_Info*)p)-&gt;<span class="pl-smi">request</span>;
+	<span class="pl-c1">Sleep</span>(delay);<span class="pl-c"><span class="pl-c">//</span>休眠</span>
+	cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>生产者 <span class="pl-pds">"</span></span> &lt;&lt; thread_id &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span> 开始生产<span class="pl-pds">"</span></span> &lt;&lt; endl;
 
-	for (int i = 0; i &lt; n_rerquest; i++){
-		WaitForSingleObject(empty_semaphore, -1);//不为空执行，为空阻塞
+	<span class="pl-k">for</span> (<span class="pl-k">int</span> i = <span class="pl-c1">0</span>; i &lt; n_rerquest; i++){
+		<span class="pl-c1">WaitForSingleObject</span>(empty_semaphore, -<span class="pl-c1">1</span>);<span class="pl-c"><span class="pl-c">//</span>不为空执行，为空阻塞</span>
 
-		WaitForSingleObject(p_mutex, -1);//没有其他生产者则执行
-		int ProducePos = FindProducePosition();
+		<span class="pl-c1">WaitForSingleObject</span>(p_mutex, -<span class="pl-c1">1</span>);<span class="pl-c"><span class="pl-c">//</span>没有其他生产者则执行</span>
+		<span class="pl-k">int</span> ProducePos = <span class="pl-c1">FindProducePosition</span>();
 		
 
-		//以下代码可异步 原因：在分配位置过程中对数组标记
-		cout &lt;&lt; "生产者 " &lt;&lt; thread_id &lt;&lt; " 开始生产产品: " &lt;&lt; request.at(i) &lt;&lt; endl;
-		Buffer[ProducePos] = request.at(i);
-		cout &lt;&lt; "生产者 " &lt;&lt; thread_id &lt;&lt; " 生产完成产品: " &lt;&lt; request.at(i) &lt;&lt; endl;
-		cout &lt;&lt; "Buffer[" &lt;&lt; ProducePos &lt;&lt; "] : " &lt;&lt; request.at(i) &lt;&lt; endl;
-		PriBuffer();//输出结果
-		ReleaseMutex(p_mutex);//之所以放在这里是样问cout可能被拆分
-		ReleaseSemaphore(syn_semaphore[request.at(i)], 1, NULL);
+		<span class="pl-c"><span class="pl-c">//</span>以下代码可异步 原因：在分配位置过程中对数组标记</span>
+		cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>生产者 <span class="pl-pds">"</span></span> &lt;&lt; thread_id &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span> 开始生产产品: <span class="pl-pds">"</span></span> &lt;&lt; request.<span class="pl-c1">at</span>(i) &lt;&lt; endl;
+		Buffer[ProducePos] = request.<span class="pl-c1">at</span>(i);
+		cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>生产者 <span class="pl-pds">"</span></span> &lt;&lt; thread_id &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span> 生产完成产品: <span class="pl-pds">"</span></span> &lt;&lt; request.<span class="pl-c1">at</span>(i) &lt;&lt; endl;
+		cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Buffer[<span class="pl-pds">"</span></span> &lt;&lt; ProducePos &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>] : <span class="pl-pds">"</span></span> &lt;&lt; request.<span class="pl-c1">at</span>(i) &lt;&lt; endl;
+		<span class="pl-c1">PriBuffer</span>();<span class="pl-c"><span class="pl-c">//</span>输出结果</span>
+		<span class="pl-c1">ReleaseMutex</span>(p_mutex);<span class="pl-c"><span class="pl-c">//</span>之所以放在这里是样问cout可能被拆分</span>
+		<span class="pl-c1">ReleaseSemaphore</span>(syn_semaphore[request.<span class="pl-c1">at</span>(i)], <span class="pl-c1">1</span>, <span class="pl-c1">NULL</span>);
 	}
 }
 
-//消费者
-void Consume(void *p){
+<span class="pl-c"><span class="pl-c">//</span>消费者</span>
+<span class="pl-k">void</span> <span class="pl-en">Consume</span>(<span class="pl-k">void</span> *p){
 	DWORD wait_for_semaphore;
-	int thread_id = ((Thread_Info*)p)-&gt;thread_id;
-	char kind = ((Thread_Info*)p)-&gt;kind;
-	double delay = ((Thread_Info*)p)-&gt;delay;
-	int n_rerquest = ((Thread_Info*)p)-&gt;n_request;
-	vector&lt;int&gt; request = ((Thread_Info*)p)-&gt;request;
-	Sleep(delay);//休眠
+	<span class="pl-k">int</span> thread_id = ((Thread_Info*)p)-&gt;<span class="pl-smi">thread_id</span>;
+	<span class="pl-k">char</span> kind = ((Thread_Info*)p)-&gt;<span class="pl-smi">kind</span>;
+	<span class="pl-k">double</span> delay = ((Thread_Info*)p)-&gt;<span class="pl-smi">delay</span>;
+	<span class="pl-k">int</span> n_rerquest = ((Thread_Info*)p)-&gt;<span class="pl-smi">n_request</span>;
+	vector&lt;<span class="pl-k">int</span>&gt; request = ((Thread_Info*)p)-&gt;<span class="pl-smi">request</span>;
+	<span class="pl-c1">Sleep</span>(delay);<span class="pl-c"><span class="pl-c">//</span>休眠</span>
 
-	for (int i = 0; i &lt; n_rerquest; i++){
-		wait_for_semaphore = WaitForSingleObject(syn_semaphore[request.at(i)], -1);//产品存在则消费
-		cout &lt;&lt; "消费者 " &lt;&lt; thread_id &lt;&lt; " 请求消费产品 " &lt;&lt; request.at(i) &lt;&lt; endl;
-		int ProductPos = FindBufferPosition(request.at(i));//找到产品位置
-		EnterCriticalSection(&amp;pc_cirtical[request.at(i)]);
-		cout &lt;&lt; "消费者 " &lt;&lt; thread_id &lt;&lt; " 开始消费产品 " &lt;&lt; request.at(i) &lt;&lt; endl;
-		Buffer[ProductPos] = -1;
-		cout &lt;&lt; "消费者 " &lt;&lt; thread_id &lt;&lt; " 消费完成产品 " &lt;&lt; request.at(i) &lt;&lt; endl;
-		PriBuffer();//输出结果
-		ReleaseSemaphore(empty_semaphore, 1, NULL);
-		LeaveCriticalSection(&amp;pc_cirtical[request.at(i)]);
+	<span class="pl-k">for</span> (<span class="pl-k">int</span> i = <span class="pl-c1">0</span>; i &lt; n_rerquest; i++){
+		wait_for_semaphore = <span class="pl-c1">WaitForSingleObject</span>(syn_semaphore[request.<span class="pl-c1">at</span>(i)], -<span class="pl-c1">1</span>);<span class="pl-c"><span class="pl-c">//</span>产品存在则消费</span>
+		cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>消费者 <span class="pl-pds">"</span></span> &lt;&lt; thread_id &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span> 请求消费产品 <span class="pl-pds">"</span></span> &lt;&lt; request.<span class="pl-c1">at</span>(i) &lt;&lt; endl;
+		<span class="pl-k">int</span> ProductPos = <span class="pl-c1">FindBufferPosition</span>(request.<span class="pl-c1">at</span>(i));<span class="pl-c"><span class="pl-c">//</span>找到产品位置</span>
+		<span class="pl-c1">EnterCriticalSection</span>(&amp;pc_cirtical[request.<span class="pl-c1">at</span>(i)]);
+		cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>消费者 <span class="pl-pds">"</span></span> &lt;&lt; thread_id &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span> 开始消费产品 <span class="pl-pds">"</span></span> &lt;&lt; request.<span class="pl-c1">at</span>(i) &lt;&lt; endl;
+		Buffer[ProductPos] = -<span class="pl-c1">1</span>;
+		cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>消费者 <span class="pl-pds">"</span></span> &lt;&lt; thread_id &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span> 消费完成产品 <span class="pl-pds">"</span></span> &lt;&lt; request.<span class="pl-c1">at</span>(i) &lt;&lt; endl;
+		<span class="pl-c1">PriBuffer</span>();<span class="pl-c"><span class="pl-c">//</span>输出结果</span>
+		<span class="pl-c1">ReleaseSemaphore</span>(empty_semaphore, <span class="pl-c1">1</span>, <span class="pl-c1">NULL</span>);
+		<span class="pl-c1">LeaveCriticalSection</span>(&amp;pc_cirtical[request.<span class="pl-c1">at</span>(i)]);
 	}
 }
 
-int main(){
+<span class="pl-k">int</span> <span class="pl-en">main</span>(){
 
-	cout &lt;&lt; "请输入线程数量: ";
+	cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>请输入线程数量: <span class="pl-pds">"</span></span>;
 	cin &gt;&gt; thread_num;
-	cout &lt;&lt; "请输入缓冲区数量: ";
+	cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>请输入缓冲区数量: <span class="pl-pds">"</span></span>;
 	cin &gt;&gt; n_buffer;
-	cout &lt;&lt; "请输入线程信息 (例：p 100 1 2 3) p.c为类型 数字为延迟和产品id" &lt;&lt; endl;
-	cout &lt;&lt; endl &lt;&lt; "********************************************" &lt;&lt; endl &lt;&lt; endl;
+	cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>请输入线程信息 (例：p 100 1 2 3) p.c为类型 数字为延迟和产品id<span class="pl-pds">"</span></span> &lt;&lt; endl;
+	cout &lt;&lt; endl &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>********************************************<span class="pl-pds">"</span></span> &lt;&lt; endl &lt;&lt; endl;
 
-	for (int i = 0; i &lt; MAX_BUFFER_NUM; i++){
-		Buffer[i] = -1;
+	<span class="pl-k">for</span> (<span class="pl-k">int</span> i = <span class="pl-c1">0</span>; i &lt; MAX_BUFFER_NUM; i++){
+		Buffer[i] = -<span class="pl-c1">1</span>;
 	}
 
-	for (int i = 0; i &lt; thread_num; i++){
+	<span class="pl-k">for</span> (<span class="pl-k">int</span> i = <span class="pl-c1">0</span>; i &lt; thread_num; i++){
 		Thread_Info t_thread_info;
-		cout &lt;&lt; "线程 " &lt;&lt; i &lt;&lt; " :";
-		cin &gt;&gt; t_thread_info.kind;//输入种类
-		cin &gt;&gt; t_thread_info.delay;//输入延迟
-		t_thread_info.thread_id = i;//初始化线程id
-		int t_num;
-		while (cin &gt;&gt; t_num){
+		cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>线程 <span class="pl-pds">"</span></span> &lt;&lt; i &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span> :<span class="pl-pds">"</span></span>;
+		cin &gt;&gt; t_thread_info.<span class="pl-smi">kind</span>;<span class="pl-c"><span class="pl-c">//</span>输入种类</span>
+		cin &gt;&gt; t_thread_info.<span class="pl-smi">delay</span>;<span class="pl-c"><span class="pl-c">//</span>输入延迟</span>
+		t_thread_info.<span class="pl-smi">thread_id</span> = i;<span class="pl-c"><span class="pl-c">//</span>初始化线程id</span>
+		<span class="pl-k">int</span> t_num;
+		<span class="pl-k">while</span> (cin &gt;&gt; t_num){
 			
-			t_thread_info.request.push_back(t_num);
-			if (t_thread_info.kind == 'p') t_set.insert(t_num); 
-			t_thread_info.n_request++;
-			if (cin.get() == '\n') break;
+			t_thread_info.<span class="pl-smi">request</span>.<span class="pl-c1">push_back</span>(t_num);
+			<span class="pl-k">if</span> (t_thread_info.<span class="pl-smi">kind</span> == <span class="pl-s"><span class="pl-pds">'</span>p<span class="pl-pds">'</span></span>) t_set.<span class="pl-c1">insert</span>(t_num); 
+			t_thread_info.<span class="pl-smi">n_request</span>++;
+			<span class="pl-k">if</span> (cin.<span class="pl-c1">get</span>() == <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>) <span class="pl-k">break</span>;
 		}
-		thread_info.push_back(t_thread_info);
+		thread_info.<span class="pl-c1">push_back</span>(t_thread_info);
 	}
 
-	n_produce = t_set.size();
-	empty_semaphore = CreateSemaphore(NULL, n_buffer, n_buffer, (LPCWSTR)"semaphore_for_empty");//初始化同步信号量
-	p_mutex = CreateMutex(NULL, FALSE, (LPCWSTR)"mutex_for_update");//初始化互斥变量
-	for (int i = 0; i &lt; n_produce; i++){
-		string lp = "semaphore_for_prodece_";
-		int t = i;
-		while (t){
-			char ch = (char)(t % 10);
+	n_produce = t_set.<span class="pl-c1">size</span>();
+	empty_semaphore = <span class="pl-c1">CreateSemaphore</span>(<span class="pl-c1">NULL</span>, n_buffer, n_buffer, (LPCWSTR)<span class="pl-s"><span class="pl-pds">"</span>semaphore_for_empty<span class="pl-pds">"</span></span>);<span class="pl-c"><span class="pl-c">//</span>初始化同步信号量</span>
+	p_mutex = <span class="pl-c1">CreateMutex</span>(<span class="pl-c1">NULL</span>, <span class="pl-c1">FALSE</span>, (LPCWSTR)<span class="pl-s"><span class="pl-pds">"</span>mutex_for_update<span class="pl-pds">"</span></span>);<span class="pl-c"><span class="pl-c">//</span>初始化互斥变量</span>
+	<span class="pl-k">for</span> (<span class="pl-k">int</span> i = <span class="pl-c1">0</span>; i &lt; n_produce; i++){
+		string lp = <span class="pl-s"><span class="pl-pds">"</span>semaphore_for_prodece_<span class="pl-pds">"</span></span>;
+		<span class="pl-k">int</span> t = i;
+		<span class="pl-k">while</span> (t){
+			<span class="pl-k">char</span> ch = (<span class="pl-k">char</span>)(t % <span class="pl-c1">10</span>);
 			lp += ch;
-			t /= 10;
+			t /= <span class="pl-c1">10</span>;
 		}
-		syn_semaphore[i] = CreateSemaphore(NULL, 0, MAX_PRODUCE_NUM, (LPCWSTR)lp.c_str());
+		syn_semaphore[i] = <span class="pl-c1">CreateSemaphore</span>(<span class="pl-c1">NULL</span>, <span class="pl-c1">0</span>, MAX_PRODUCE_NUM, (LPCWSTR)lp.<span class="pl-c1">c_str</span>());
 	}
-	for (int i = 0; i &lt; MAX_BUFFER_NUM; i++){
-		InitializeCriticalSection(&amp;(pc_cirtical[i]));//初始化临界量
-	}
-
-	cout &lt;&lt; endl &lt;&lt; "********************************************" &lt;&lt; endl &lt;&lt; endl;;
-	cout &lt;&lt; "********************线程开始执行********************" &lt;&lt; endl;
-	for (int i = 0; i &lt; thread_num; i++){
-		if (thread_info.at(i).kind == 'p')
-			thread_list[i] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)(Produce), &amp;thread_info.at(i), 0, NULL);
-		else
-			thread_list[i] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)(Consume), &amp;thread_info.at(i), 0, NULL);
+	<span class="pl-k">for</span> (<span class="pl-k">int</span> i = <span class="pl-c1">0</span>; i &lt; MAX_BUFFER_NUM; i++){
+		<span class="pl-c1">InitializeCriticalSection</span>(&amp;(pc_cirtical[i]));<span class="pl-c"><span class="pl-c">//</span>初始化临界量</span>
 	}
 
-	WaitForMultipleObjects(thread_num, thread_list, TRUE, -1);
-	cout &lt;&lt; endl &lt;&lt; "********************线程执行结束********************" &lt;&lt; endl&lt;&lt;endl;
-	cout &lt;&lt; "完成!" &lt;&lt; endl;
-	return 0;
+	cout &lt;&lt; endl &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>********************************************<span class="pl-pds">"</span></span> &lt;&lt; endl &lt;&lt; endl;;
+	cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>********************线程开始执行********************<span class="pl-pds">"</span></span> &lt;&lt; endl;
+	<span class="pl-k">for</span> (<span class="pl-k">int</span> i = <span class="pl-c1">0</span>; i &lt; thread_num; i++){
+		<span class="pl-k">if</span> (thread_info.<span class="pl-c1">at</span>(i).<span class="pl-smi">kind</span> == <span class="pl-s"><span class="pl-pds">'</span>p<span class="pl-pds">'</span></span>)
+			thread_list[i] = <span class="pl-c1">CreateThread</span>(<span class="pl-c1">NULL</span>, <span class="pl-c1">0</span>, (LPTHREAD_START_ROUTINE)(Produce), &amp;thread_info.<span class="pl-c1">at</span>(i), <span class="pl-c1">0</span>, <span class="pl-c1">NULL</span>);
+		<span class="pl-k">else</span>
+			thread_list[i] = <span class="pl-c1">CreateThread</span>(<span class="pl-c1">NULL</span>, <span class="pl-c1">0</span>, (LPTHREAD_START_ROUTINE)(Consume), &amp;thread_info.<span class="pl-c1">at</span>(i), <span class="pl-c1">0</span>, <span class="pl-c1">NULL</span>);
+	}
+
+	<span class="pl-c1">WaitForMultipleObjects</span>(thread_num, thread_list, <span class="pl-c1">TRUE</span>, -<span class="pl-c1">1</span>);
+	cout &lt;&lt; endl &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>********************线程执行结束********************<span class="pl-pds">"</span></span> &lt;&lt; endl&lt;&lt;endl;
+	cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>完成!<span class="pl-pds">"</span></span> &lt;&lt; endl;
+	<span class="pl-k">return</span> <span class="pl-c1">0</span>;
 }</pre></div></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
